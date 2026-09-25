@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 const signup = async (req, res) => {
   try {
@@ -101,10 +102,28 @@ const forgotPassword = async(req, res)=>{
 
     await user.save();
 
-    res.json({
-      message:"Password reset token generated",
-      resetToken,
-    });
+   const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: email,
+  subject: "AI Finance Dashboard - Password Reset",
+  text: `Reset your password using this link:
+
+http://localhost:5173/reset-password?token=${resetToken}
+
+This link expires in 15 minutes.`,
+});
+
+res.json({
+  message: "Password reset email sent successfully",
+});
   }catch(error){
     console.error(error);
     res.status(500).json({

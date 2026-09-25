@@ -10,7 +10,7 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { TransactionProvider } from "./context/TransactionContext.jsx";
-
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 import { Routes, Route, Outlet } from "react-router-dom";
 
@@ -41,6 +41,7 @@ function App() {
   path="/forgot-password"
   element={<Forgotpassword />}
 />
+<Route path="/reset-password" element={<ResetPassword />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>

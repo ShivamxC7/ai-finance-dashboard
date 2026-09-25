@@ -11,7 +11,7 @@ function Forgotpassword(){
         console.log("Forgot password submitted", email);
 
         const response = await fetch(
-            "http://localhost:5000/auth/forgot-password",
+            `${import.meta.env.VITE_API_URL}/auth/forgot-password`,
             {
                 method: "POST",
                 headers: {
