@@ -5,7 +5,7 @@ import {
     updateTransaction,
 } from "../services/transactionApi";
 
-function AddTransaction({transactions, setTransactions,
+function AddTransaction({setTransactions,
     editingTransaction, setEditingTransaction
 }){
 

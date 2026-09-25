@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SettingsItem from "../components/SettingsItem";
 import { useNavigate } from "react-router-dom";
+import { deleteAllTransactions } from "../services/transactionApi";
 import {
   FaUserCircle,
   FaPalette,
@@ -9,14 +10,40 @@ import {
   FaShieldAlt,
   FaInfoCircle,
   FaTrash,
-  FaChevronRight,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
-function Settings() {
 
-  const userName = "Guest User";
+
+  function Settings() {
+  const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(true);
   const navigate = useNavigate();
+
+useEffect(() => {
+  const fetchProfile = async () => {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch("http://localhost:5000/auth/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setUser(data);
+    }
+  };
+
+  fetchProfile();
+}, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
 
 
@@ -32,21 +59,21 @@ function Settings() {
       </p>
 
 
-      <div className="bg-white rounded-xl shadow-md mt-8 p-6 hover:shadow-lg transition cursor-pointer">
+      <div className="bg-white rounded-xl shadow-md mt-8 p-6 hover:shadow-lg transition ">
 
         <div className="flex items-center">
 
           <div className="w-16 h-16 rounded-full bg-blue-600 text-white
           flex items-center justify-center text-2xl font-bold">
 
-           {userName.charAt(0)}
+           {user ? user.firstName.charAt(0) : "U"}
 
           </div>
 
           <div className="ml-5 flex-1">
 
             <h2 className="text-xl font-semibold text-gray-900">
-              {userName}
+              {user ? `${user.firstName} ${user.lastName}` : "Loading..."}
             </h2>
 
             <p className="text-gray-500: text-gray-400">
@@ -55,8 +82,7 @@ function Settings() {
 
           </div>
 
-          <FaChevronRight className="text-gray-400"/>
-
+          
         </div>
 
       </div>
@@ -94,6 +120,12 @@ function Settings() {
   onClick={() => navigate("/about")}
 />
 
+ <SettingsItem
+  icon={<FaSignOutAlt />}
+  title="Logout"
+  onClick={handleLogout}
+/>
+
       </div>
 
       {/* Danger Zone */}
@@ -106,11 +138,32 @@ function Settings() {
 
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
 
-          <SettingsItem
-            icon={<FaTrash />}
-            title="Clear All Transactions"
-            danger={true}
-          />
+         <SettingsItem
+  icon={<FaTrash />}
+  title="Clear All Transactions"
+  danger={true}
+  onClick={async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete all transactions?"
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await deleteAllTransactions();
+
+    if (response.message === "All transactions deleted successfully") {
+      alert("All transactions deleted successfully.");
+      window.location.reload();
+    } else {
+      alert("Failed to delete transactions.");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete transactions.");
+  }
+}}
+/>
 
         </div>
 

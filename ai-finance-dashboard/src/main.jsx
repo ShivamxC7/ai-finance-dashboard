@@ -9,10 +9,9 @@ import App from './App.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
    
-    <TransactionProvider>
     <BrowserRouter>
     <App />
     </BrowserRouter>
-    </TransactionProvider>
+    
   </StrictMode>
 )

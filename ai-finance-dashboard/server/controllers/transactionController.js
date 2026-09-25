@@ -2,7 +2,7 @@ const Transaction = require("../models/Transaction");
 
 exports.getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find();
+    const transactions = await Transaction.find({ user: req.userId });
 
     res.json(transactions);
   } catch (error) {
@@ -14,7 +14,10 @@ exports.getTransactions = async (req, res) => {
 
 exports.createTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.create(req.body);
+    const transaction = await Transaction.create({
+      ...req.body,
+      user: req.userId,
+    });
 
     res.status(201).json(transaction);
   } catch (error) {
@@ -25,23 +28,29 @@ exports.createTransaction = async (req, res) => {
 };
 
 exports.deleteTransaction = async (req, res) => {
-    try {
-        await Transaction.findByIdAndDelete(req.params.id);
+  try {
+    await Transaction.findOneAndDelete({
+      _id: req.params.id,
+      user: req.userId,
+    });
 
-        res.json({
-            message: "Transaction deleted successfully",
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: error.message,
-        });
-    }
+    res.json({
+      message: "Transaction deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 exports.updateTransaction = async (req, res) => {
-  try{
-    const updatedTransaction = await Transaction.findByIdAndUpdate(
-      req.params.id,
+  try {
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        user: req.userId,
+      },
       req.body,
       {
         new: true,
@@ -49,11 +58,25 @@ exports.updateTransaction = async (req, res) => {
     );
 
     res.json(updatedTransaction);
-
-  } catch(error) {
+  } catch (error) {
     res.status(500).json({
       message: error.message,
     });
+  }
+};
 
+exports.deleteAllTransactions = async (req, res) => {
+  try {
+    await Transaction.deleteMany({
+      user: req.userId,
+    });
+
+    res.json({
+      message: "All transactions deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };

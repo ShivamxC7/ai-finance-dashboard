@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useContext } from "react";
 import { TransactionContext } from "../context/TransactionContext";
-
+import API_URL from "../services/api";
 
 function AICoach() {
   const [question, setQuestion] = useState("");
@@ -13,7 +13,7 @@ function AICoach() {
   const chatEndRef = useRef(null);
 
 
-const sendMessage = (text) => {
+const sendMessage = async (text) => {
   if (!text.trim()) return;
 
   const userMessage = {
@@ -22,21 +22,41 @@ const sendMessage = (text) => {
     text,
   };
 
-  const aiMessage = {
-  id: Date.now() + 1,
-  sender: "ai",
-  text: "🚧 This feature will be available soon. Stay tuned for the next update!",
-};
-  if (!comingSoonShown) {
-    setMessages([userMessage, aiMessage]);
-    setComingSoonShown(true);
-  } else {
-    setMessages((prev) => [...prev, userMessage, aiMessage]);
-  }
-
+  setMessages((prev) => [...prev, userMessage]);
   setQuestion("");
-};
 
+  try {
+    const response = await fetch(`${API_URL}/ai/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: text }),
+    });
+
+    const data = await response.json();
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now() + 1,
+        sender: "ai",
+        text: data.answer,
+      },
+    ]);
+  } catch (error) {
+    console.error(error);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now() + 1,
+        sender: "ai",
+        text: "Sorry, I couldn't process your request.",
+      },
+    ]);
+  }
+};
 
 const handleSend = () => {
   sendMessage(question);
