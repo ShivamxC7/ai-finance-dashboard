@@ -116,7 +116,7 @@ await transporter.sendMail({
   subject: "AI Finance Dashboard - Password Reset",
   text: `Reset your password using this link:
 
-http://localhost:5173/reset-password?token=${resetToken}
+https://ai-finance-dashboard-phi.vercel.app/reset-password?token=${resetToken}
 
 This link expires in 15 minutes.`,
 });
