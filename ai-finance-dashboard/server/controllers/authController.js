@@ -1,3 +1,5 @@
+import { Resend } from "resend";
+
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -102,17 +104,11 @@ const forgotPassword = async(req, res)=>{
 
     await user.save();
 
-   const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+   const resend = new Resend(process.env.RESEND_API_KEY);
 
-await transporter.sendMail({
-  from: process.env.EMAIL_USER,
-  to: email,
+await resend.emails.send({
+  from: "AI Finance Dashboard <onboarding@resend.dev>",
+  to: [email],
   subject: "AI Finance Dashboard - Password Reset",
   text: `Reset your password using this link:
 
