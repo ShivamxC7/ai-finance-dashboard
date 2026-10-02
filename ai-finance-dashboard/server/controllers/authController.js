@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+const { Resend } = require("resend");
 
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
